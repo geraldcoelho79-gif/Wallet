@@ -76,3 +76,33 @@ npm run build
 npm run server
 ```
 puis depuis un browser http://localhost:3001
+
+### Mode En Ligne
+
+Pour le déploiement en ligne, l'application est hébergée sur [Render](https://render.com/), une plateforme "Platform as a Service" (PaaS) qui propose une offre gratuite pour les projets Node.js.
+
+Le projet sur Render est directement lié au repository Git de mon projet Wallet. Grâce à cette intégration, chaque `push` sur la branche principale peut déclencher un nouveau déploiement automatique. La plateforme se charge d'exécuter les commandes de build et de démarrage nécessaires.
+
+Le processus de déploiement est donc simplifié à l'extrême :
+1.  Pousser les modifications sur le repository GitHub.
+2.  Render détecte les changements, reconstruit l'application (`npm run build`) et redémarre le serveur (`npm run server`).
+3.  L'application est mise à jour et accessible via une URL publique fournie par Render.
+
+```
+                               +-----------------+
+                               |                 |
+Développeur --(git push)-----> | Repository Git  |
+                               |   (GitHub)      |
+                               |                 |
+                               +-------+---------+
+                                       | (Déclencheur de déploiement)
+                                       v
++-----------------+            +-----------------+
+|                 |            |                 |
+|  Navigateur     | <--------> |   Render.com    |
+|   (Utilisateur) |            | (Build & Serve) |
+|                 |            |                 |
++-----------------+            +-----------------+
+```
+
+puis depuis un browser https://wallet-veff.onrender.com
