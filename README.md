@@ -46,6 +46,12 @@ puis depuis un browser http://localhost:5173
 
 Ce script se charge de démarrer simultanément le serveur Vite et le serveur Express.
 
+#### Test de l'API REST
+
+Pour faciliter le test de l'API REST fournie par le backend Express, un ensemble de requêtes prêtes à l'emploi est disponible.
+
+En utilisant l'extension [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) pour Visual Studio Code, vous pouvez directement exécuter les requêtes définies dans les fichiers du répertoire `requests/`. Cela permet de tester les différents endpoints de l'API de manière simple et rapide, sans avoir à passer par un client API externe.
+
 ### Mode Production
 
 En production, l'architecture est optimisée pour la performance et la simplicité de déploiement.
