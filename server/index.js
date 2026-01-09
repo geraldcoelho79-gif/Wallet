@@ -1,9 +1,9 @@
 import express from 'express';
 
 const app = express();
-const PORT = 3001
+const PORT = process.env.PORT || 3001;
 
-app.use(express.static('dist'))
+app.use(express.static('./server/dist'))
 
 // Middleware to log requests
 app.use((req, res, next) => {
@@ -13,7 +13,7 @@ app.use((req, res, next) => {
 
 // An api endpoint
 app.get("/api", (req, res) => {
-  res.json({ message: "Hello from server !!!" });
+  res.json({ message: "Hello from server !!" });
 });
 
 
