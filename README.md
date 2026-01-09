@@ -52,6 +52,19 @@ Pour faciliter le test de l'API REST fournie par le backend Express, un ensemble
 
 En utilisant l'extension [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) pour Visual Studio Code, vous pouvez directement exécuter les requêtes définies dans les fichiers du répertoire `requests/`. Cela permet de tester les différents endpoints de l'API de manière simple et rapide, sans avoir à passer par un client API externe.
 
+#### Débugage du serveur Express (API REST)
+
+Pour débuguer le code du serveur Express et de l'API REST, une configuration de débogage est intégrée.
+
+1.  Lancez le serveur en mode débugage avec la commande :
+    ```bash
+    npm run debug
+    ```
+2.  Ouvrez les outils de développement de votre navigateur Chrome (`Chrome Developer Tools`).
+3.  Cliquez sur l'icône verte de Node.js ("Open dedicated DevTools for Node") qui apparaît dans la console des outils de développement.
+4.  Une nouvelle fenêtre DevTools s'ouvrira, connectée à votre processus Node.js. Vous pourrez y naviguer dans le code source du serveur, définir des points d'arrêt (`breakpoints`) et inspecter les variables pour analyser le comportement du backend.
+
+
 ### Mode Production
 
 En production, l'architecture est optimisée pour la performance et la simplicité de déploiement.
