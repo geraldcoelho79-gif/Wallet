@@ -131,12 +131,12 @@ Développeur --(git push)-----> | Repository Git  |
                                +-------+---------+
                                        | (Déclencheur de déploiement)
                                        v
-+-----------------+            +-----------------+
-|                 |            |                 |
-|  Navigateur     | <--------> |   Render.com    |
-|   (Utilisateur) |            | (Build & Serve) |
-|                 |            |                 |
-+-----------------+            +-----------------+
++-----------------+            +-----------------+      +-------------------+
+|                 |            |                 |      |                   |
+|  Navigateur     | <--------> |   Render.com    |----->|   MongoDB Atlas   |
+|   (Utilisateur) |            | (Build & Serve) |      | (Base de données) |
+|                 |            |                 |      |                   |
++-----------------+            +-----------------+      +-------------------+
 ```
 
 puis depuis un browser https://wallet-veff.onrender.com
