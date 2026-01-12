@@ -21,16 +21,27 @@ app.get("/api", (req, res) => {
 });
 
 // --- New endpoint to get all lists ---
-app.get("/lists", async (req, res) => {
+app.get("/lists", async (req, res, next) => {
   try {
     console.log("entering endpoint")
     const lists = await List.find();
     console.log(lists);
     res.json(lists);
   } catch (err) {
-    console.error("Error fetching lists:", err);
-    res.status(500).json({ message: "Server error while fetching lists" });
+    next(err);
   }
+});
+
+// Middleware for non-existent endpoints
+app.use((req, res) => {
+  res.status(404).json({ message: "Endpoint unknown" });
+});
+
+// Error handling middleware
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error("Error fetching:", err);
+  res.status(500).json({ message: "Server error" });
 });
 
 
