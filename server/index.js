@@ -4,7 +4,6 @@ import { List } from './database.js';
 import 'dotenv/config';
 
 const app = express();
-// eslint-disable-next-line no-undef
 const PORT = process.env.PORT;
 
 app.use(express.static('./server/dist'))
@@ -16,14 +15,14 @@ app.use((req, res, next) => {
 });
 
 // An api endpoint
-app.get("/api", (req, res) => {
-  res.json({ message: "Hello from server !!" });
+app.get('/api', (req, res) => {
+  res.json({ message: 'Hello from server !!' });
 });
 
 // --- New endpoint to get all lists ---
-app.get("/lists", async (req, res, next) => {
+app.get('/lists', async (req, res, next) => {
   try {
-    console.log("entering endpoint")
+    console.log('entering endpoint')
     const lists = await List.find();
     console.log(lists);
     res.json(lists);
@@ -34,14 +33,14 @@ app.get("/lists", async (req, res, next) => {
 
 // Middleware for non-existent endpoints
 app.use((req, res) => {
-  res.status(404).json({ message: "Endpoint unknown" });
+  res.status(404).json({ message: 'Endpoint unknown' });
 });
 
 // Error handling middleware
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error("Error fetching:", err);
-  res.status(500).json({ message: "Server error" });
+  console.error('Error fetching:', err);
+  res.status(500).json({ message: 'Server error' });
 });
 
 

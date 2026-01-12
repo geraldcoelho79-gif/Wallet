@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import 'dotenv/config';
 
 // --- MongoDB Connection ---
-// eslint-disable-next-line no-undef
 const mongoURI = process.env.MONGO_URI;
 mongoose.connect(mongoURI)
   .then(() => console.log('MongoDB connected successfully.'))

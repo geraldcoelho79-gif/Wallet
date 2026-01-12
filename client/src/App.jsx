@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 function App() {
   const [list, setList] = useState(null);
 
   useEffect(() => {
-    fetch("/lists")
+    fetch('/lists')
       .then((res) => res.json())
       .then((data) => {
         // We'll take the first list from the response
