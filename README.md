@@ -18,22 +18,22 @@ Le projet est organisé en deux répertoires distincts :
 - `client/` : Contient le code source de l'application front-end développée avec React.
 - `server/` : Contient le code source du serveur back-end et de l'API REST, développés avec Express.js.
 
-### Mode Développement
+### Mode Développement Local
 
 En environnement de développement, l'architecture est conçue pour faciliter le développement rapide et les itérations.
 
 ```
-+-----------------+      +------------------------+      +------------------+
-|                 |      |                        |      |                  |
-|    Navigateur   |----->|   Serveur Dev VITE     |----->|  Serveur Express |
-| (Code React)    |      | (Proxy vers /api)      |      |    (API REST)    |
-|                 |      |                        |      |                  |
-+-----------------+      +------------------------+      +------------------+
++-----------------+      +------------------------+      +------------------+      +-------------------------+
+|                 |      |                        |      |                  |      |                         |
+|    Navigateur   |----->|   Serveur Dev VITE     |----->|  Serveur Express |----->|  Base de données MongoDB|
+| (Code React)    |      | (Proxy vers /api)      |      |    (API REST)    |      |                         |
+|                 |      |                        |      |                  |      |                         |
++-----------------+      +------------------------+      +------------------+      +-------------------------+
 ```
 
 - Le **navigateur** exécute le code React.
 - Le **serveur de développement Vite** sert l'application React et rafraîchit la page à chaque modification du code (`Hot Module Replacement`). Il est également configuré comme un **proxy** : toutes les requêtes commençant par `/api` sont redirigées vers le serveur Express.
-- Le **serveur Express** implémente l'API REST qui gère la logique métier et les données.
+- Le **serveur Express** implémente l'API REST qui gère la logique métier et communique avec la base de données **MongoDB**.
 
 Grâce à cette configuration, du point de vue du navigateur, toutes les requêtes semblent être adressées à un seul et même serveur (Vite), ce qui évite les problèmes de CORS.
 
@@ -65,26 +65,26 @@ Pour débuguer le code du serveur Express et de l'API REST, une configuration de
 4.  Une nouvelle fenêtre DevTools s'ouvrira, connectée à votre processus Node.js. Vous pourrez y naviguer dans le code source du serveur, définir des points d'arrêt (`breakpoints`) et inspecter les variables pour analyser le comportement du backend.
 
 
-### Mode Production
+### Mode Production Local
 
 En production, l'architecture est optimisée pour la performance et la simplicité de déploiement.
 
 ```
-+-----------------+      +------------------------------------+
-|                 |      |                                    |
-|    Navigateur   |----->|          Serveur Express           |
-|                 |      | (Sert les fichiers statiques React |
-|                 |      |      et implémente l'API REST)     |
-+-----------------+      |                                    |
-                       +------------------------------------+
++-----------------+      +------------------------------------+      +-------------------------+
+|                 |      |                                    |      |                         |
+|    Navigateur   |----->|          Serveur Express           |----->|  Base de données MongoDB|
+|                 |      | (Sert les fichiers statiques React |      |                         |
+|                 |      |      et implémente l'API REST)     |      |                         |
++-----------------+      +------------------------------------+      +-------------------------+
 ```
 
 1.  **Build du client :** Le code de l'application React est compilé et optimisé via une commande de build (par exemple `npm run build`). Cette étape génère des fichiers statiques (HTML, CSS, JavaScript) dans un répertoire `dist` du serveur Express. Cela est realisé par configuration de Vite dans vite.config.js.
 2.  **Service unifié :** Le contenu du répertoire `dist` est ensuite servi directement par le serveur Express en tant que ressources statiques.
 
-Dans ce mode, le **serveur Express** a une double responsabilité :
+Dans ce mode, le **serveur Express** a une triple responsabilité :
 - Servir l'application React "buildée" au navigateur.
 - Implémenter l'API REST.
+- Se connecter à la base de données **MongoDB**.
 
 Le navigateur n'interagit plus qu'avec une seule entité : le serveur Express.
 
@@ -96,9 +96,24 @@ npm run server
 ```
 puis depuis un browser http://localhost:3001
 
-### Mode En Ligne
+### Mode Production En Ligne
 
-Pour le déploiement en ligne, l'application est hébergée sur [Render](https://render.com/), une plateforme "Platform as a Service" (PaaS) qui propose une offre gratuite pour les projets Node.js.
+Pour le déploiement en ligne, l'application est hébergée sur la plateforme PaaS [Render](https://render.com/), une plateforme "Platform as a Service" (PaaS) qui propose une offre gratuite pour les projets Node.js. L'architecture est similaire au mode production, mais les composants sont distribués.
+
+```
++-----------------+      +--------------------------------+      +--------------------------+
+|                 |      |                                |      |                          |
+|    Navigateur   |----->|     Render.com                 |----->|     MongoDB Atlas        |
+|                 |      |    (Serveur Express)           |      |   (Base de données)      |
+|                 |      |                                |      |                          |
++-----------------+      +--------------------------------+      +--------------------------+
+```
+
+- Le **navigateur** de l'utilisateur final accède à l'application servie par Render.
+- **Render** exécute le serveur Express, qui sert les fichiers statiques de React et expose l'API REST.
+- Le serveur Express sur Render se connecte à une instance de base de données **MongoDB Atlas** (la version cloud de MongoDB).
+
+La connexion entre Render et MongoDB Atlas est configurée à l'aide de **variables d'environnement** dans le dashboard de Render. Cela permet de ne pas stocker les informations de connexion (la chaîne de connexion URI) dans le code source, ce qui est une bonne pratique de sécurité. Le fichier `.env` utilisé en développement est ignoré par Git et n'est donc pas déployé.
 
 Le projet sur Render est directement lié au repository Git de mon projet Wallet. Grâce à cette intégration, chaque `push` sur la branche principale peut déclencher un nouveau déploiement automatique. La plateforme se charge d'exécuter les commandes de build et de démarrage nécessaires.
 

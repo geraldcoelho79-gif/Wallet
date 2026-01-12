@@ -1,17 +1,31 @@
 import { useEffect, useState } from "react";
 
 function App() {
-  const [data, setData] = useState(null);
+  const [list, setList] = useState(null);
 
   useEffect(() => {
-    fetch("/api", { cache: "no-cache" })
+    fetch("/lists")
       .then((res) => res.json())
-      .then((data) => setData(data.message));
+      .then((data) => {
+        // We'll take the first list from the response
+        if (data && data.length > 0) {
+          setList(data[0]);
+        }
+      });
   }, []);
 
   return (
     <div>
-      <p>{!data ? "Loading..." : data}</p>
+      <h1>My Stock List</h1>
+      {!list ? (
+        <p>Loading...</p>
+      ) : (
+        <ul>
+          {list.tickers.map((ticker, index) => (
+            <li key={index}>{ticker}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
