@@ -23,12 +23,12 @@ Le projet est organisé en deux répertoires distincts :
 En environnement de développement, l'architecture est conçue pour faciliter le développement rapide et les itérations.
 
 ```
-+-----------------+      +------------------------+      +------------------+      +-------------------------+
-|                 |      |                        |      |                  |      |                         |
-|    Navigateur   |----->|   Serveur Dev VITE     |----->|  Serveur Express |----->|  Base de données MongoDB|
-| (Code React)    |      | (Proxy vers /api)      |      |    (API REST)    |      |                         |
-|                 |      |                        |      |                  |      |                         |
-+-----------------+      +------------------------+      +------------------+      +-------------------------+
++-----------------+      +------------------------+      +--------------------------------+      +-------------------------+
+|                 |      |                        |      |         Serveur Express        |      |                         |
+|    Navigateur   |----->|   Serveur Dev VITE     |----->|           (API REST)           |----->|  Base de données MongoDB|
+| (Code React)    |      | (Proxy vers /api)      |      |     (NODE_ENV=development)     |      |                         |
+|                 |      |                        |      |                                |      |                         |
++-----------------+      +------------------------+      +--------------------------------+      +-------------------------+
 ```
 
 - Le **navigateur** exécute le code React.
@@ -70,12 +70,12 @@ Pour débuguer le code du serveur Express et de l'API REST, une configuration de
 En production, l'architecture est optimisée pour la performance et la simplicité de déploiement.
 
 ```
-+-----------------+      +------------------------------------+      +-------------------------+
-|                 |      |                                    |      |                         |
-|    Navigateur   |----->|          Serveur Express           |----->|  Base de données MongoDB|
-|                 |      | (Sert les fichiers statiques React |      |                         |
-|                 |      |      et implémente l'API REST)     |      |                         |
-+-----------------+      +------------------------------------+      +-------------------------+
++-----------------+      +-----------------------------------------+      +-------------------------+
+|                 |      |             Serveur Express             |      |                         |
+|    Navigateur   |----->|   (Sert les fichiers statiques React    |----->|  Base de données MongoDB|
+|                 |      |        et implémente l'API REST)        |      |                         |
+|                 |      |         (NODE_ENV=production)           |      |                         |
++-----------------+      +-----------------------------------------+      +-------------------------+
 ```
 
 1.  **Build du client :** Le code de l'application React est compilé et optimisé via une commande de build (par exemple `npm run build`). Cette étape génère des fichiers statiques (HTML, CSS, JavaScript) dans un répertoire `dist` du serveur Express. Cela est realisé par configuration de Vite dans vite.config.js.
@@ -92,7 +92,7 @@ Pour lancer l'environnement de production localement, deux commandes sont néces
 
 ```bash
 npm run build
-npm run server
+npm run production
 ```
 puis depuis un browser http://localhost:3001
 
@@ -105,7 +105,7 @@ Pour le déploiement en ligne, l'application est hébergée sur la plateforme Pa
 |                 |      |                                |      |                          |
 |    Navigateur   |----->|     Render.com                 |----->|     MongoDB Atlas        |
 |                 |      |    (Serveur Express)           |      |   (Base de données)      |
-|                 |      |                                |      |                          |
+|                 |      |    (NODE_ENV=production)       |      |                          |
 +-----------------+      +--------------------------------+      +--------------------------+
 ```
 
@@ -119,7 +119,7 @@ Le projet sur Render est directement lié au repository Git de mon projet Wallet
 
 Le processus de déploiement est donc simplifié à l'extrême :
 1.  Pousser les modifications sur le repository GitHub.
-2.  Render détecte les changements, reconstruit l'application (`npm run build`) et redémarre le serveur (`npm run server`).
+2.  Render détecte les changements, reconstruit l'application (`npm run build`) et redémarre le serveur (`npm run production`).
 3.  L'application est mise à jour et accessible via une URL publique fournie par Render.
 
 ```
@@ -138,5 +138,29 @@ Développeur --(git push)-----> | Repository Git  |
 |                 |            |                 |      |                   |
 +-----------------+            +-----------------+      +-------------------+
 ```
-
 puis depuis un browser https://wallet-veff.onrender.com
+
+L'architecture en production en ligne est similaire à celle en production locale. Le serveur Express sert les fichiers statiques de l'application React et expose l'API REST. La principale différence réside dans l'environnement d'hébergement, qui est une plateforme PaaS (Render).
+
+### Mode Test
+
+Pour garantir la fiabilité et la robustesse de l'API REST, des tests d'intégration sont mis en place. Ce mode est spécifiquement conçu pour exécuter ces tests dans un environnement isolé, sans impacter les données de développement ou de production.
+
+```
++--------------------------------+      +-------------------------+
+|                                |      |                         |
+|    Serveur Express (API REST)  |----->|  Base de données MongoDB|
+|      (NODE_ENV=test)           |      |    (Base de données     |
+|                                |      |        de test)         |
++--------------------------------+      +-------------------------+
+```
+
+- Le **serveur Express** est lancé avec la variable d'environnement `NODE_ENV` définie sur `test`.
+- Cette configuration amène le serveur à se connecter à une **base de données MongoDB distincte**, dédiée aux tests, comme défini dans le fichier [`server/utils/config.js`](server/utils/config.js).
+- Le framework de test [Jest](https://jestjs.io/) est utilisé pour exécuter les scénarios de test qui effectuent des requêtes HTTP sur l'API et vérifient les réponses.
+
+Pour lancer la suite de tests, utilisez la commande suivante :
+
+```bash
+npm run test
+```
