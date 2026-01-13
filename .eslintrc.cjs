@@ -21,6 +21,7 @@ module.exports = {
       files: ['server/**/*.js'],
       env: {
         node: true,
+        jest: true,
       },
     },
     {
