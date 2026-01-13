@@ -1,0 +1,8 @@
+### Add a ticker to a list
+# @name addTicker
+POST http://localhost:3001/lists/6964e9e7d494f7cdd601fd7a/tickers
+Content-Type: application/json
+
+{
+  "ticker": "NEW_TICKER"
+}

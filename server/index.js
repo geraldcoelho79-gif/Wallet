@@ -6,6 +6,7 @@ import 'dotenv/config';
 const app = express();
 const PORT = process.env.PORT;
 
+app.use(express.json());
 app.use(express.static('./server/dist'))
 
 // Middleware to log requests
@@ -26,6 +27,31 @@ app.get('/lists', async (req, res, next) => {
     const lists = await List.find();
     console.log(lists);
     res.json(lists);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// --- New endpoint to add a ticker to a list ---
+app.post('/lists/:id/tickers', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { ticker } = req.body;
+
+    if (!ticker) {
+      return res.status(400).json({ message: 'Ticker is required' });
+    }
+
+    const list = await List.findById(id);
+
+    if (!list) {
+      return res.status(404).json({ message: 'List not found' });
+    }
+
+    list.tickers.push(ticker);
+    await list.save();
+    console.log(list);
+    res.json(list);
   } catch (err) {
     next(err);
   }
