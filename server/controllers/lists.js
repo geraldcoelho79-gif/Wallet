@@ -41,4 +41,53 @@ listsRouter.post('/:id/tickers', async (req, res, next) => {
   }
 });
 
+// --- Endpoint to create a new list ---
+listsRouter.post('/', async (req, res, next) => {
+  try {
+    const body = req.body;
+
+    if (body.name === undefined) {
+      return res.status(400).json({ error: 'name missing' });
+    }
+
+    const list = new List({
+      name: body.name,
+      tickers: body.tickers || [],
+    });
+
+    const savedList = await list.save();
+    res.status(201).json(savedList);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// --- Endpoint to delete a list by ID ---
+listsRouter.delete('/:id', async (req, res, next) => {
+  try {
+    await List.findByIdAndDelete(req.params.id);
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// --- Endpoint to delete a ticker from a list ---
+listsRouter.delete('/:id/tickers/:ticker', async (req, res, next) => {
+  try {
+    const list = await List.findById(req.params.id);
+    if (!list) {
+      return res.status(404).json({ error: 'list not found' });
+    }
+
+    const tickerToRemove = req.params.ticker;
+    list.tickers = list.tickers.filter((t) => t !== tickerToRemove);
+
+    const updatedList = await list.save();
+    res.json(updatedList);
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default listsRouter;

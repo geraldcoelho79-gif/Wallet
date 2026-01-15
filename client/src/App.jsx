@@ -1,32 +1,26 @@
 import { useEffect, useState } from 'react';
+import StockList from './components/StockList';
 
 function App() {
-  // first list document in MongoDB
-  const [list, setList] = useState(null);
-  const [newTicker, setNewTicker] = useState('');
+  const [lists, setLists] = useState([]);
+  const [newListName, setNewListName] = useState('');
 
   useEffect(() => {
     fetch('/lists')
       .then((res) => res.json())
       .then((data) => {
-        // We'll take the first list from the response
-        if (data && data.length > 0) {
-          setList(data[0]);
-        }
+        setLists(data);
       });
   }, []);
 
-  const handleAddTicker = async (e) => {
-    e.preventDefault();
-    if (!newTicker.trim() || !list) return;
-
+  const handleAddTicker = async (listId, ticker) => {
     try {
-      const response = await fetch(`/lists/${list._id}/tickers`, {
+      const response = await fetch(`/lists/${listId}/tickers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ticker: newTicker }),
+        body: JSON.stringify({ ticker }),
       });
 
       if (!response.ok) {
@@ -34,35 +28,96 @@ function App() {
       }
 
       const updatedList = await response.json();
-      setList(updatedList);
-      setNewTicker('');
+      setLists(lists.map((list) => (list._id === listId ? updatedList : list)));
     } catch (error) {
       console.error('Error adding ticker:', error);
     }
   };
 
+  const handleCreateList = async (e) => {
+    e.preventDefault();
+    if (!newListName.trim()) return;
+
+    try {
+      const response = await fetch('/lists', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: newListName, tickers: [] }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create list');
+      }
+
+      const newList = await response.json();
+      setLists([...lists, newList]);
+      setNewListName('');
+    } catch (error) {
+      console.error('Error creating list:', error);
+    }
+  };
+
+  const handleDeleteList = async (listId) => {
+    try {
+      const response = await fetch(`/lists/${listId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete list');
+      }
+
+      setLists(lists.filter((list) => list._id !== listId));
+    } catch (error) {
+      console.error('Error deleting list:', error);
+    }
+  };
+
+  const handleDeleteTicker = async (listId, ticker) => {
+    try {
+      const response = await fetch(`/lists/${listId}/tickers/${ticker}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete ticker');
+      }
+
+      const updatedList = await response.json();
+      setLists(lists.map((list) => (list._id === listId ? updatedList : list)));
+    } catch (error) {
+      console.error('Error deleting ticker:', error);
+    }
+  };
+
   return (
     <div>
-      <h1>My Stock List</h1>
-      {!list ? (
-        <p>Loading...</p>
+      <h1>My Stock Lists</h1>
+      <h2>Create New List</h2>
+      <form onSubmit={handleCreateList}>
+        <input
+          type="text"
+          value={newListName}
+          onChange={(e) => setNewListName(e.target.value)}
+          placeholder="Enter list name"
+        />
+        <button type="submit">Create List</button>
+      </form>
+
+      {lists.length === 0 ? (
+        <p>No lists yet. Create one above!</p>
       ) : (
-        <ul>
-          {list.tickers.map((ticker, index) => (
-            <li key={index}>{ticker}</li>
-          ))}
-        </ul>
-      )}
-      {list && (
-        <form onSubmit={handleAddTicker}>
-          <input
-            type="text"
-            value={newTicker}
-            onChange={(e) => setNewTicker(e.target.value)}
-            placeholder="Enter new ticker"
+        lists.map((list) => (
+          <StockList
+            key={list._id}
+            list={list}
+            onDeleteList={handleDeleteList}
+            onDeleteTicker={handleDeleteTicker}
+            onAddTicker={handleAddTicker}
           />
-          <button type="submit">Add Ticker</button>
-        </form>
+        ))
       )}
     </div>
   );
