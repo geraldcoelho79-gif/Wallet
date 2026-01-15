@@ -164,3 +164,44 @@ Pour lancer la suite de tests, utilisez la commande suivante :
 ```bash
 npm run test
 ```
+
+## Modèle de Données
+
+L'application utilise MongoDB comme base de données NoSQL. Le schéma de données est défini à l'aide de Mongoose et se compose de deux modèles principaux : **User** et **List**, reliés par une relation **One-to-Many** (un utilisateur peut avoir plusieurs listes).
+
+### Schéma des Modèles
+
+```
++---------------------------+                    +---------------------------+
+|          User             |                    |          List             |
++---------------------------+                    +---------------------------+
+| _id: ObjectId             |                    | _id: ObjectId             |
+| username: String          |                    | name: String              |
+|   - required: true        |       1:N          | tickers: [String]         |
+|   - unique: true          |<------------------>| user: ObjectId            |
+|   - minlength: 3          |                    |   - ref: 'User'           |
+| name: String              |                    |   - required: true        |
+|   - required: true        |                    +---------------------------+
+| password: String          |
+|   - required: true        |
+|   - minlength: 3          |
+| lists: [ObjectId]         |
+|   - ref: 'List'           |
++---------------------------+
+```
+
+### Description des Relations
+
+- **User** → **List** : Un utilisateur peut posséder **plusieurs listes** (relation One-to-Many).
+  - Le modèle `User` contient un tableau `lists` qui stocke les références (ObjectId) vers les listes appartenant à l'utilisateur.
+  - Le modèle `List` contient une référence `user` qui pointe vers l'ObjectId de l'utilisateur propriétaire.
+
+Cette relation bidirectionnelle permet :
+- De récupérer facilement toutes les listes d'un utilisateur via `User.populate('lists')`.
+- De connaître le propriétaire d'une liste via `List.populate('user')`.
+
+### Collections MongoDB
+
+Les modèles Mongoose sont mappés vers les collections MongoDB suivantes :
+- Modèle `User` → Collection `Users`
+- Modèle `List` → Collection `Lists`

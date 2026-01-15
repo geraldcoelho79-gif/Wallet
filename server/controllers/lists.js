@@ -1,5 +1,6 @@
 import express from 'express';
 import { List } from '../models/list.js';
+import { User } from '../models/user.js';
 import logger from '../utils/logger.js';
 
 const listsRouter = express.Router();
@@ -50,12 +51,29 @@ listsRouter.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'name missing' });
     }
 
+    if (body.username === undefined) {
+      return res.status(400).json({ error: 'username missing' });
+    }
+
+    // Find the user by username
+    const user = await User.findOne({ username: body.username });
+
+    if (!user) {
+      return res.status(404).json({ error: 'user not found' });
+    }
+
     const list = new List({
       name: body.name,
       tickers: body.tickers || [],
+      user: user._id,
     });
 
     const savedList = await list.save();
+
+    // Add the list to the user's lists array
+    user.lists = user.lists.concat(savedList._id);
+    await user.save();
+
     res.status(201).json(savedList);
   } catch (err) {
     next(err);
@@ -65,6 +83,19 @@ listsRouter.post('/', async (req, res, next) => {
 // --- Endpoint to delete a list by ID ---
 listsRouter.delete('/:id', async (req, res, next) => {
   try {
+    const list = await List.findById(req.params.id);
+
+    if (!list) {
+      return res.status(404).json({ error: 'list not found' });
+    }
+
+    // Remove the list from the user's lists array
+    const user = await User.findById(list.user);
+    if (user) {
+      user.lists = user.lists.filter(listId => !listId.equals(list._id));
+      await user.save();
+    }
+
     await List.findByIdAndDelete(req.params.id);
     res.status(204).end();
   } catch (err) {

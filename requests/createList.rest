@@ -1,6 +1,8 @@
+### Create a new list
 POST http://localhost:3001/lists
 Content-Type: application/json
 
 {
-  "name": "Ma nouvelle liste"
+  "name": "Ma nouvelle liste",
+  "username": "testuser1"
 }

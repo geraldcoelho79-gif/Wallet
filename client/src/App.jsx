@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react';
 import StockList from './components/StockList';
 
 function App() {
+  // Hardcoded user - corresponds to Mongoose User schema
+  const currentUser = {
+    username: 'testuser1',
+    name: 'Test User 1',
+    password: 'password123'
+  };
+
   const [lists, setLists] = useState([]);
   const [newListName, setNewListName] = useState('');
 
@@ -44,7 +51,11 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: newListName, tickers: [] }),
+        body: JSON.stringify({
+          name: newListName,
+          tickers: [],
+          username: currentUser.username
+        }),
       });
 
       if (!response.ok) {
