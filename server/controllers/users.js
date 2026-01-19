@@ -1,10 +1,12 @@
 import express from 'express';
 import { User } from '../models/user.js';
+import logger from '../utils/logger.js';
 
 const usersRouter = express.Router();
 
 // --- Endpoint to get all users with their lists (populate)---
 usersRouter.get('/', async (req, res, next) => {
+  logger.info('entering get Users endpoint');
   try {
     const users = await User.find().populate('lists');
     res.json(users);
@@ -15,6 +17,7 @@ usersRouter.get('/', async (req, res, next) => {
 
 // --- Endpoint to create a new user ---
 usersRouter.post('/', async (req, res, next) => {
+  logger.info('entering post Users endpoint');
   try {
     const body = req.body;
 
@@ -47,6 +50,7 @@ usersRouter.post('/', async (req, res, next) => {
 // --- Endpoint to delete a user by ID ---
 usersRouter.delete('/:id', async (req, res, next) => {
   try {
+    logger.info('entering delete Users endpoint');
     await User.findByIdAndDelete(req.params.id);
     res.status(204).end();
   } catch (err) {

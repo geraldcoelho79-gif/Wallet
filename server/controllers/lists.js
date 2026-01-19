@@ -8,7 +8,7 @@ const listsRouter = express.Router();
 // --- Endpoint to get all lists ---
 listsRouter.get('/', async (req, res, next) => {
   try {
-    logger.info('entering endpoint');
+    logger.info('entering get Lists endpoint');
     const lists = await List.find();
     logger.info(lists);
     res.json(lists);
@@ -20,6 +20,7 @@ listsRouter.get('/', async (req, res, next) => {
 // --- Endpoint to add a ticker to a list ---
 listsRouter.post('/:id/tickers', async (req, res, next) => {
   try {
+    logger.info('entering add a new ticker in a List endpoint');
     const { id } = req.params;
     const { ticker } = req.body;
 
@@ -45,6 +46,7 @@ listsRouter.post('/:id/tickers', async (req, res, next) => {
 // --- Endpoint to create a new list ---
 listsRouter.post('/', async (req, res, next) => {
   try {
+    logger.info('entering post List endpoint');
     const body = req.body;
 
     if (body.name === undefined) {
@@ -83,6 +85,7 @@ listsRouter.post('/', async (req, res, next) => {
 // --- Endpoint to delete a list by ID ---
 listsRouter.delete('/:id', async (req, res, next) => {
   try {
+    logger.info('entering delete List endpoint');
     const list = await List.findById(req.params.id);
 
     if (!list) {
@@ -106,6 +109,7 @@ listsRouter.delete('/:id', async (req, res, next) => {
 // --- Endpoint to delete a ticker from a list ---
 listsRouter.delete('/:id/tickers/:ticker', async (req, res, next) => {
   try {
+    logger.info('entering delete ticker from List endpoint');
     const list = await List.findById(req.params.id);
     if (!list) {
       return res.status(404).json({ error: 'list not found' });
