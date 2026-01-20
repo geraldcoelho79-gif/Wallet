@@ -14,7 +14,7 @@ beforeEach(async () => {
   const userObjects = initialUsers.map(user => new User({
     username: user.username,
     name: user.name,
-    password: user.password,
+    passwordHash: user.passwordHash,
     lists: []
   }));
   await Promise.all(userObjects.map(user => user.save()));
@@ -115,6 +115,25 @@ describe('addition of a new user', () => {
     expect(response.body.lists).toBeDefined();
     expect(response.body.lists).toHaveLength(0);
   });
+
+  test('user with duplicate username is not added', async () => {
+    const newUser = {
+      username: 'testuser1',
+      name: 'Duplicate User',
+      password: 'password999'
+    };
+
+    const result = await api
+      .post('/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+
+    expect(result.body.error).toContain('expected `username` to be unique');
+
+    const response = await api.get('/users');
+    expect(response.body).toHaveLength(initialUsers.length);
+  });
 });
 
 describe('deletion of a user', () => {
@@ -123,7 +142,7 @@ describe('deletion of a user', () => {
     const userToDelete = usersAtStart.body[0];
 
     await api
-      .delete(`/users/${userToDelete._id}`)
+      .delete(`/users/${userToDelete.id}`)
       .expect(204);
 
     const usersAtEnd = await api.get('/users');

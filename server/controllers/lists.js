@@ -93,6 +93,7 @@ listsRouter.delete('/:id', async (req, res, next) => {
     }
 
     // Remove the list from the user's lists array
+    console.log(`finding user ${list.user} to update lists array`);
     const user = await User.findById(list.user);
     if (user) {
       user.lists = user.lists.filter(listId => !listId.equals(list._id));

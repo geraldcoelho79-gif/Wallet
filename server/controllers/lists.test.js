@@ -17,7 +17,7 @@ beforeEach(async () => {
   const userObjects = initialUsers.map(user => new User({
     username: user.username,
     name: user.name,
-    password: user.password,
+    passwordHash: user.passwordHash,
     lists: []
   }));
   const savedUsers = await Promise.all(userObjects.map(user => user.save()));

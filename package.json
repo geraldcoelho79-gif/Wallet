@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "vite",
     "server": "NODE_ENV=development node --watch server/index.js",
-    "debug": "node --inspect server/index.js",
+    "debug": "NODE_ENV=development node --inspect server/index.js",
     "build": "vite build --emptyOutDir",
     "production": "NODE_ENV=production node server/index.js",
     "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest server --runInBand",
@@ -15,6 +15,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "mongoose": "^9.1.3",

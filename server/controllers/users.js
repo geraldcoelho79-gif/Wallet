@@ -1,4 +1,5 @@
 import express from 'express';
+import bcrypt from 'bcrypt';
 import { User } from '../models/user.js';
 import logger from '../utils/logger.js';
 
@@ -33,13 +34,15 @@ usersRouter.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'password missing' });
     }
 
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(body.password, saltRounds);
+    console.log('Creating user with hash:', passwordHash);
     const user = new User({
       username: body.username,
       name: body.name,
-      password: body.password,
-      lists: [],
+      passwordHash,
     });
-
+    // console.log(mongoose.models.User.schema.body);
     const savedUser = await user.save();
     res.status(201).json(savedUser);
   } catch (err) {
