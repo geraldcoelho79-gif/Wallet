@@ -1,15 +1,13 @@
-import pino from 'pino';
+const info = (...params) => {
+  console.log(...params);
+};
 
-const logger = pino({
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      translateTime: 'SYS:dd-mm-yyyy HH:MM:ss',
-      ignore: 'pid,hostname'
-    }
-  }
-});
+const error = (...params) => {
+  console.error(...params);
+};
 
-export default logger;
+export default {
+  info,
+  error,
+};
 
